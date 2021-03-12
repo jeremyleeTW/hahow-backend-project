@@ -82,6 +82,17 @@ Dependencies
 - prettier (Code stylier plugin needed by vscode)
 - supertest (http agent to test http)
 
+Q & A
+-----
+
+* 選擇註解的時機
+  
+通常會需要註解的時候，有可能是該邏輯本身有歷史淵源，會特別放上去，方便未來有機會接手的人理解。另外，如果有不可避免的原因，導致程式碼難理解抽象化的意義是什麼，無法清楚用程式碼的語意快速了解的狀態下，也會註解
+
+* 遇到最大的問題
+
+第三方 api 文件細節部份比較沒有提到，例如 200 response code 有出現上頭範例 response body 以外的內容。這部份我會第一尋求第三方的窗口協助，進一部了解可能的情形。並且進一步來處理例外情形
+
 Author
 -----
 Jeremy Li
