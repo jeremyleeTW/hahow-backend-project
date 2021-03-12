@@ -22,9 +22,9 @@ const profileHero = (id: number) => {
 };
 
 // Authenticate / POST
-const authenticate = (username: string, password: string) => {
+const authenticate = (name: string, password: string) => {
     return axios.post(`${HOST_URL}/auth`, {
-        username,
+        name,
         password
     }, {
         validateStatus (status) {

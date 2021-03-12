@@ -27,7 +27,9 @@ describe("integration testings", () => {
 
         test("it should be ok to return list of heroes with profile when authenticated successfully", async () => {
             const response = await supertest(app)
-                .get("/heroes");
+                .get("/heroes")
+                .set("User", "hahow")
+                .set("Password", "rocks");
 
             expect(response.status).toBe(httpStatusCode.OK);
             expect(response.headers["content-type"]).toBe(HEADER_CONTENT_TYPE);
