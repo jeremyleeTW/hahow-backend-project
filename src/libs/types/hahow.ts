@@ -11,16 +11,6 @@ export interface IHero {
     image: string;
 }
 
-interface IAuthenticatedHero extends IHero {
+export interface IAuthenticatedHero extends IHero {
     profile: IProfile;
 }
-
-export interface IContentHeroes {
-    heroes: IHero[];
-}
-
-export interface IContentAuthenticatedHeroes {
-    heroes: IAuthenticatedHero[];
-}
-
-export type ResponseBodyListHeroes = IContentAuthenticatedHeroes | IContentHeroes;

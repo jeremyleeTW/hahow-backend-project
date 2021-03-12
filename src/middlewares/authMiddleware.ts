@@ -1,6 +1,6 @@
 import express from "express";
-import {authenticate} from "../libs/hahow";
 import httpStatusCode from "http-status-codes";
+import {authenticate} from "../libs/hahow";
 import logger from "../libs/logger";
 
 const log = logger("authMiddleware");
@@ -26,7 +26,7 @@ const authMiddleware = async (req: express.Request, res: express.Response, next:
                 res.status(httpStatusCode.UNAUTHORIZED).send(ERROR_MESSAGE_AUTHENTICATION_FAILURE);
                 break;
             default:
-                log.error(`authentication server responds with unknown code: ${response.status}`)
+                log.error(`authentication server responds with unknown code: ${response.status}`);
                 throw new Error("unknown response code");
         }
 

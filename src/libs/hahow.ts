@@ -1,6 +1,6 @@
 import axios from "axios";
-import {IContentHeroes, IHero, IProfile} from "./types/hahow";
 import httpStatusCode from "http-status-codes";
+import {IHero, IProfile} from "./types/hahow";
 
 const HOST_URL = "https://hahow-recruit.herokuapp.com";
 
@@ -8,7 +8,7 @@ const HOST_URL = "https://hahow-recruit.herokuapp.com";
 
 // List Heroes / GET
 const listHeroes = () => {
-    return axios.get<IContentHeroes>(`${HOST_URL}/heroes`);
+    return axios.get<IHero[]>(`${HOST_URL}/heroes`);
 };
 
 // Single Hero / GET
@@ -27,7 +27,7 @@ const authenticate = (username: string, password: string) => {
         username,
         password
     }, {
-        validateStatus: function (status) {
+        validateStatus (status) {
             return status === httpStatusCode.OK
                 || status === httpStatusCode.BAD_REQUEST
                 || status === httpStatusCode.UNAUTHORIZED;
