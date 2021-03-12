@@ -1,6 +1,6 @@
 import axios from "axios";
 import httpStatusCode from "http-status-codes";
-import {IHero, IProfile} from "./types/hahow";
+import {IHero, IProfile, IUnknownError} from "./types/hahow";
 
 const HOST_URL = "https://hahow-recruit.herokuapp.com";
 
@@ -8,17 +8,35 @@ const HOST_URL = "https://hahow-recruit.herokuapp.com";
 
 // List Heroes / GET
 const listHeroes = () => {
-    return axios.get<IHero[]>(`${HOST_URL}/heroes`);
+    return axios.get<IHero[] | IUnknownError>(`${HOST_URL}/heroes`,
+        {
+            validateStatus(status) {
+                return status === httpStatusCode.OK ||
+                    status === httpStatusCode.NOT_FOUND;
+            }
+        });
 };
 
 // Single Hero / GET
-const singleHero = (id: number) => {
-    return axios.get<IHero>(`${HOST_URL}/heroes/${id.toString()}`);
+const singleHero = (id: string) => {
+    return axios.get<IHero | IUnknownError>(`${HOST_URL}/heroes/${id}`,
+        {
+            validateStatus(status) {
+                return status === httpStatusCode.OK ||
+                    status === httpStatusCode.NOT_FOUND;
+            }
+        });
 };
 
 // Profile of Hero / GET
-const profileHero = (id: number) => {
-    return axios.get<IProfile>(`${HOST_URL}/heroes/${id.toString()}/profile`);
+const profileHero = (id: string) => {
+    return axios.get<IProfile | IUnknownError>(`${HOST_URL}/heroes/${id}/profile`,
+        {
+            validateStatus(status) {
+                return status === httpStatusCode.OK ||
+                    status === httpStatusCode.NOT_FOUND;
+            }
+        });
 };
 
 // Authenticate / POST

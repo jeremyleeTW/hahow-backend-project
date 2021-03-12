@@ -1,8 +1,8 @@
 import express from "express";
 import httpStatusCode from "http-status-codes";
-import {listHeroes, profileHero} from "../libs/hahow";
+import {listHeroes, profileHero, singleHero} from "../libs/hahow";
 import {IAuthenticatedHero, IHero} from "../libs/types/hahow";
-import {IResponseBodyHeroes} from "./types/hahowController";
+import {IResponseBodyHero, IResponseBodyHeroes} from "./types/hahowController";
 
 const getHeroes = async (
     req: express.Request,
@@ -12,9 +12,21 @@ const getHeroes = async (
     try {
         const authenticated = !!(req.auth);
 
-        const {data} = await listHeroes();
+        const responseHeroes = await listHeroes();
+        if (responseHeroes.status === httpStatusCode.NOT_FOUND) {
+            res.status(httpStatusCode.NOT_FOUND).end();
+            return;
+        }
+        if (!Array.isArray(responseHeroes.data)) {
+            throw new Error("not an array");
+        }
+        if ("code" in responseHeroes.data) {
+            const {code, message} = responseHeroes.data;
+            next(new Error(`getHeroes failed: code=${code} message=${message}`));
+            return;
+        }
 
-        const heroes = await Promise.all(data.map(async (h) => {
+        const heroes = await Promise.all(responseHeroes.data.map(async (h) => {
             const {id, image, name} = h;
 
             if (!authenticated) {
@@ -25,7 +37,17 @@ const getHeroes = async (
                 } as IHero;
             }
 
-            const profile = (await profileHero(Number(id))).data;
+            const responseHero = await profileHero(id);
+            if (responseHero.status === httpStatusCode.NOT_FOUND) {
+                res.status(httpStatusCode.NOT_FOUND).end();
+                return;
+            }
+            if ("code" in responseHero.data) {
+                const {code, message} = responseHero.data;
+                next(new Error(`getProfile failed: code=${code} message=${message}`));
+                return;
+            }
+            const profile = responseHero.data;
 
             return {
                 id,
@@ -47,7 +69,34 @@ const getHero = async (
     next: express.NextFunction
 ) => {
     try {
-        throw new Error("unimplemented");
+        const heroId = req.params.heroId;
+        const authenticated = !!(req.auth);
+
+        const responseHero = await singleHero(heroId);
+        if (responseHero.status === httpStatusCode.NOT_FOUND) {
+            res.status(httpStatusCode.NOT_FOUND).end();
+            return;
+        }
+        if ("code" in responseHero.data) {
+            const {code, message} = responseHero.data;
+            next(new Error(`getHero failed: code=${code} message=${message}`));
+            return;
+        }
+
+        if (!authenticated) {
+            res.json(responseHero.data as IResponseBodyHero);
+            return;
+        }
+
+        const responseProfile = await profileHero(heroId);
+        if (responseProfile.status === httpStatusCode.NOT_FOUND) {
+            res.status(httpStatusCode.NOT_FOUND).end();
+            return;
+        }
+        res.json({
+            ...responseHero.data,
+            profile: responseProfile.data
+        } as IResponseBodyHero);
     } catch (error) {
         next(error);
     }
