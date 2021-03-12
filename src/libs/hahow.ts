@@ -1,5 +1,6 @@
 import axios from "axios";
 import {IContentHeroes, IHero, IProfile} from "./types/hahow";
+import httpStatusCode from "http-status-codes";
 
 const HOST_URL = "https://hahow-recruit.herokuapp.com";
 
@@ -25,6 +26,12 @@ const authenticate = (username: string, password: string) => {
     return axios.post(`${HOST_URL}/auth`, {
         username,
         password
+    }, {
+        validateStatus: function (status) {
+            return status === httpStatusCode.OK
+                || status === httpStatusCode.BAD_REQUEST
+                || status === httpStatusCode.UNAUTHORIZED;
+        }
     });
 };
 

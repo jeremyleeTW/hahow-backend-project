@@ -1,5 +1,9 @@
 import express from "express";
 import {authenticate} from "../libs/hahow";
+import httpStatusCode from "http-status-codes";
+import logger from "../libs/logger";
+
+const log = logger("authMiddleware");
 
 const ERROR_MESSAGE_AUTHENTICATION_FAILURE = "authentication failure";
 
@@ -9,16 +13,21 @@ const authMiddleware = async (req: express.Request, res: express.Response, next:
         const username = req.header("User");
         const password = req.header("Password");
         if (!username || !password) {
-            // TODO detail every possible responses
-            res.status(401).send(ERROR_MESSAGE_AUTHENTICATION_FAILURE);
+            next();
             return;
         }
 
         const response = await authenticate(username, password);
         switch (response.status) {
-            case 200:
+            case httpStatusCode.OK:
                 req.auth = true;
                 break;
+            case httpStatusCode.UNAUTHORIZED:
+                res.status(httpStatusCode.UNAUTHORIZED).send(ERROR_MESSAGE_AUTHENTICATION_FAILURE);
+                break;
+            default:
+                log.error(`authentication server responds with unknown code: ${response.status}`)
+                throw new Error("unknown response code");
         }
 
         next();
